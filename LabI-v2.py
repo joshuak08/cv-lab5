@@ -109,6 +109,32 @@ if __name__ == '__main__':
     '''
     #########################################
 
+    # blue line is z axis, red is x axis
+    theta = np.pi * 45*5/180.
+    name_list.append('sphere_n')
+    sph_mesh=o3d.geometry.TriangleMesh.create_sphere(radius=1)
+    mesh_list.append(sph_mesh)
+    r = 10
+    H0_wc = np.array(
+                [[1,            0,              0,  0],
+                # rotates the position of the camera
+                [0, np.cos(theta), -np.sin(theta),  0],
+                # rotates the orientation of the camera
+                [0, np.sin(theta),  np.cos(theta), 20], 
+                [0, 0, 0, 1]]
+            )
+    H0_cw = np.linalg.inv(H0_wc)
+    hyp = abs(1/np.sin(theta))
+    Pc = np.array([0, 0, 20-hyp, 1])
+    Pw = np.matmul(H0_cw, Pc)
+    P_homo = np.append(np.array([
+        [1,0,0],
+        [0,1,0],
+        [0,0,1],
+        [0,0,0]
+    ]), Pw.reshape((4,1)), axis=1)
+    H_list.append(P_homo)
+    RGB_list.append([0., 0.5, 0.5])
 
     # arrange plane and sphere in the space
     obj_meshes = []
@@ -146,10 +172,18 @@ if __name__ == '__main__':
     # theta = 0.
     H0_wc = np.array(
                 [[1,            0,              0,  0],
-                [0, np.cos(theta), -np.sin(theta),  0], 
+                # rotates the position of the camera
+                [0, np.cos(theta), -np.sin(theta),  0],
+                # rotates the orientation of the camera
                 [0, np.sin(theta),  np.cos(theta), 20], 
                 [0, 0, 0, 1]]
             )
+    # H0_wc = np.array([
+    #     [1,0,0,0],
+    #     [0,0.8660254037,0.5,0],
+    #     [0,-0.5,0.8660254037,20],
+    #     [0,0,0,1]
+    # ])
 
     # camera_1 (world to camera)
     theta = np.pi * 80/180.
@@ -167,8 +201,10 @@ if __name__ == '__main__':
                 [0, 0, 0, 1]]
             )
     H1_wc = np.matmul(H1_1, H1_0)
-    render_list = [(H0_wc, 'view0.png', 'depth0.png'), 
-                   (H1_wc, 'view1.png', 'depth1.png')]
+    # render_list = [(H0_wc, 'view0.png', 'depth0.png'), 
+    #                (H1_wc, 'view1.png', 'depth1.png')]
+    render_list = [(H0_wc, 'test_view0.png', 'test_depth0.png'), 
+                   (H1_wc, 'test_view1.png', 'test_depth1.png')]
 
 
     ###################################################
